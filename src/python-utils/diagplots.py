@@ -60,12 +60,14 @@ def plot_sensor(sensors, readings, chain, sample=None, units='unknown units'):
     if sample is None:
         f = chain.mean(axis=0) - chain.mean()
     elif not isinstance(sample, int):
-        print "ERROR:  sample = {} is of type {}, not int".format(
+        print( "ERROR:  sample = {} is of type {}, not int".format(
             sample, sample.__class__)
+        )
         return
     elif abs(sample) > len(chain):
-        print "ERROR:  sample = {} not in range ({}, {})".format(
+        print("ERROR:  sample = {} not in range ({}, {})".format(
                 sample, -len(chain), len(chain))
+        )
         return
     else:
         f = chain[sample] - chain[sample].mean()
@@ -130,15 +132,15 @@ def gp_predict(sensors, layer_pars, bounds):
 
     # Read out the formation at the surface
     gpz = np.array(gp_pred_list).reshape(len(layer_pars), len(Xpred))
-    print "gpz.shape =", gpz.shape
-    print "gpz =", gpz
+    print("gpz.shape =", gpz.shape)
+    print("gpz =", gpz)
     synthform = np.zeros(len(Xpred))
     for i, xy in enumerate(Xpred):
         for l in range(len(layer_pars)):
             if gpz[l,i] > 0:
                 synthform[i] = l
                 break
-    print "synthform =", synthform
+    print("synthform =", synthform)
     
     # Make a contour plot, because why not
     gridshape = autoshape(sensors)
@@ -147,8 +149,8 @@ def gp_predict(sensors, layer_pars, bounds):
     zg = synthform.reshape(*gridshape)
     # plt.contourf(xg, yg, zg, alpha=0.5)
     # plt.colorbar()
-    print "x =", x
-    print "y =", y
+    print("x =", x)
+    print("y =", y)
     for l in range(len(layer_pars)):
         idx = (synthform == l)
         plt.plot(x[idx], y[idx], label='layer {}'.format(l), ls='None', marker='o')
