@@ -12,7 +12,7 @@ Plots we want to see:
 import numpy as np
 import matplotlib.pyplot as plt
 import GPy
-
+import os
 
 def autoshape(sensors):
     """
@@ -156,33 +156,39 @@ def gp_predict(sensors, layer_pars, bounds):
         plt.plot(x[idx], y[idx], label='layer {}'.format(l), ls='None', marker='o')
     plt.legend()
 
+def load_data(parent_dir):
+    fpath = os.path.join(parent_dir, "magsensors.csv")
+    magsensors = np.loadtxt(fpath, delimiter=',')
+    fpath = os.path.join(parent_dir, "magreadings.csv")
+    magreadings = np.loadtxt(fpath, delimiter=',')
+    fpath = os.path.join(parent_dir, "gravsensors.csv")
+    gravsensors = np.loadtxt(fpath, delimiter=',')
+    fpath = os.path.join(parent_dir, "gravreadings.csv")
+    gravreadings = np.loadtxt(fpath, delimiter=',')
+    fpath = os.path.join(parent_dir, "output.npz")
+    samples = np.load(fpath)
+    return(
+        magsensors, magreadings, gravsensors, gravreadings, samples
+    )
 
-def main_contours():
+def main_contours(parent_dir = ''):
     """
     The main routine to run a suite of diagnostic plots
     """
-
-    # Load everything
-    magSensors = np.loadtxt("magSensors.csv", delimiter=',')
-    magReadings = np.loadtxt("magReadings.csv", delimiter=',')
-    gravSensors = np.loadtxt("gravSensors.csv", delimiter=',')
-    gravReadings = np.loadtxt("gravReadings.csv", delimiter=',')
-    samples = np.load("output.npz")
+    # load everything
+    load_data(parent_dir)
 
     # Make a few plots of sensors
     plot_sensor(magSensors, magReadings, samples['magReadings'], units='nT')
     plot_sensor(gravSensors, gravReadings, samples['gravReadings'], units='mgal')
 
-def main_boundarymovie():
+def main_boundarymovie(parent_dir = ''):
     """
     Makes a movie of how the boundaries change as the chain samples
     """
-    # Load everything
-    magSensors = np.loadtxt("magSensors.csv", delimiter=',')
-    magReadings = np.loadtxt("magReadings.csv", delimiter=',')
-    gravSensors = np.loadtxt("gravSensors.csv", delimiter=',')
-    gravReadings = np.loadtxt("gravReadings.csv", delimiter=',')
-    samples = np.load("output.npz")
+
+    # load everything
+    load_data(parent_dir)
 
     # Try fitting a few GP layers
     layer_labels = ['layer{}ctrlPoints'.format(i) for i in range(4)]
@@ -192,7 +198,6 @@ def main_boundarymovie():
         gp_predict(gravSensors, layer_pars, ((0.0, 2e+4), (0.0, 2e+4)))
         plt.savefig('boundary_movie_frame{:04d}.png'.format(i))
         plt.close()
-
 
 if __name__ == "__main__":
     main_contours()
