@@ -157,30 +157,46 @@ def gp_predict(sensors, layer_pars, bounds):
     plt.legend()
 
 def load_data(parent_dir):
-    fpath = os.path.join(parent_dir, "magsensors.csv")
-    magsensors = np.loadtxt(fpath, delimiter=',')
-    fpath = os.path.join(parent_dir, "magreadings.csv")
-    magreadings = np.loadtxt(fpath, delimiter=',')
-    fpath = os.path.join(parent_dir, "gravsensors.csv")
-    gravsensors = np.loadtxt(fpath, delimiter=',')
-    fpath = os.path.join(parent_dir, "gravreadings.csv")
-    gravreadings = np.loadtxt(fpath, delimiter=',')
-    fpath = os.path.join(parent_dir, "output.npz")
-    samples = np.load(fpath)
-    return(
-        magsensors, magreadings, gravsensors, gravreadings, samples
-    )
+    fname_list = [
+        ("magSensors", ".csv"),
+        ("magReadings", ".csv"),
+        ("gravSensors", ".csv"),
+        ("gravReadings", ".csv"),
+        ("output", ".npz")
+    ]
+    data_dict = {}
+    for fname, extension in fname_list:
+        data = None
+        fpath = os.path.join(parent_dir, fname + extension)
+        if extension == '.csv':
+            data = np.loadtxt(fpath, delimiter = ',')
+        elif extension == '.npz':
+            data = np.load(fpath)
+        data_dict[fname] = data
+    return(data_dict)
 
 def main_contours(parent_dir = ''):
     """
     The main routine to run a suite of diagnostic plots
     """
     # load everything
-    load_data(parent_dir)
+    data_dict = load_data(parent_dir)
 
+    # tuple format = (sensor key, reading key, samples key, unit)
+    plot_key_tuple_list = [
+        ('magSensors', 'magReadings', 'output', 'nT'),
+        ('gravSensors', 'gravReadings', 'output', 'mgal')
+    ]
     # Make a few plots of sensors
-    plot_sensor(magSensors, magReadings, samples['magReadings'], units='nT')
-    plot_sensor(gravSensors, gravReadings, samples['gravReadings'], units='mgal')
+    for sensor_key, reading_key, output_key, unit in plot_key_tuple_list:
+        samples = data_dict.get(output_key)[reading_key]
+        if samples.shape[1] > 0:
+            plot_sensor(
+                data_dict.get(sensor_key), 
+                data_dict.get(reading_key), 
+                samples, 
+                units=unit
+            )
 
 def main_boundarymovie(parent_dir = ''):
     """
@@ -188,7 +204,9 @@ def main_boundarymovie(parent_dir = ''):
     """
 
     # load everything
-    load_data(parent_dir)
+    data_dict = load_data(parent_dir)
+    samples = data_dict.get('output')
+    gravSensors = data_dict.get('gravSensors')
 
     # Try fitting a few GP layers
     layer_labels = ['layer{}ctrlPoints'.format(i) for i in range(4)]
