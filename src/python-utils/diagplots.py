@@ -38,7 +38,7 @@ def autoshape(sensors):
     elif ny == 1:
         return (nx, -1)
 
-def plot_sensor(sensors, readings, chain, sample=None, units='unknown units'):
+def plot_sensor(sensors, readings, chain, sample=None, units='unknown units', plot_fpath = None):
     """
     Plots the value of a sensor against the forward model:
         Contour plots of real data and forward models
@@ -92,7 +92,10 @@ def plot_sensor(sensors, readings, chain, sample=None, units='unknown units'):
     plt.hist(d-f, bins=20)
     plt.xlabel("Data $-$ Model ({})".format(units))
     # Show
-    plt.show()
+    if plot_fpath:
+        plt.savefig('{}.png'.format(plot_fpath))
+    else:
+        plt.show()
 
 def gp_predict(sensors, layer_pars, bounds):
     """
@@ -175,27 +178,30 @@ def load_data(parent_dir):
         data_dict[fname] = data
     return(data_dict)
 
-def main_contours(parent_dir = ''):
+def main_contours(
+    parent_dir = '',
+):
     """
     The main routine to run a suite of diagnostic plots
     """
     # load everything
     data_dict = load_data(parent_dir)
 
-    # tuple format = (sensor key, reading key, samples key, unit)
+    # tuple format = (sensor key, reading key, samples key, unit, plot file name)
     plot_key_tuple_list = [
-        ('magSensors', 'magReadings', 'output', 'nT'),
-        ('gravSensors', 'gravReadings', 'output', 'mgal')
+        ('magSensors', 'magReadings', 'output', 'nT', 'mag_contours'),
+        ('gravSensors', 'gravReadings', 'output', 'mgal', 'grav_contours')
     ]
     # Make a few plots of sensors
-    for sensor_key, reading_key, output_key, unit in plot_key_tuple_list:
+    for sensor_key, reading_key, output_key, unit, plot_fpath in plot_key_tuple_list:
         samples = data_dict.get(output_key)[reading_key]
         if samples.shape[1] > 0:
             plot_sensor(
                 data_dict.get(sensor_key), 
                 data_dict.get(reading_key), 
                 samples, 
-                units=unit
+                units=unit,
+                plot_fpath=plot_fpath
             )
 
 def main_boundarymovie(parent_dir = ''):
