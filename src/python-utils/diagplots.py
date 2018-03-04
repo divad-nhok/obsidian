@@ -179,13 +179,14 @@ def load_data(parent_dir):
     return(data_dict)
 
 def main_contours(
-    parent_dir = '',
+    data_dir = '',
+    save_dir = ''
 ):
     """
     The main routine to run a suite of diagnostic plots
     """
     # load everything
-    data_dict = load_data(parent_dir)
+    data_dict = load_data(data_dir)
 
     # tuple format = (sensor key, reading key, samples key, unit, plot file name)
     plot_key_tuple_list = [
@@ -193,7 +194,7 @@ def main_contours(
         ('gravSensors', 'gravReadings', 'output', 'mgal', 'grav_contours')
     ]
     # Make a few plots of sensors
-    for sensor_key, reading_key, output_key, unit, plot_fpath in plot_key_tuple_list:
+    for sensor_key, reading_key, output_key, unit, plot_name in plot_key_tuple_list:
         samples = data_dict.get(output_key)[reading_key]
         if samples.shape[1] > 0:
             plot_sensor(
@@ -201,7 +202,7 @@ def main_contours(
                 data_dict.get(reading_key), 
                 samples, 
                 units=unit,
-                plot_fpath=plot_fpath
+                plot_fpath=os.path.join(save_dir, plot_name)
             )
 
 def main_boundarymovie(parent_dir = ''):
