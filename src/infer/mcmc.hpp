@@ -27,6 +27,8 @@
 #include "infer/adaptive.hpp"
 #include "comms/transport.hpp"
 
+namespace ph = std::placeholders;
+
 namespace stateline
 {
   namespace mcmc
@@ -49,6 +51,8 @@ namespace stateline
             chains_(s.stacks, s.chains, s.initialTempFactor, s.proposalInitialSigma, s.initialSigmaFactor, db_, s.cacheLength, d.recover),
             lengths_(s.stacks * s.chains, 0),
             propStates_(s.stacks * s.chains, stateDim),
+            chainmean_(s.stacks * s.chains),
+            chaincov_(s.stacks * s.chains),
             locked_(s.stacks * s.chains, false),
             nextChainBeta_(s.stacks * s.chains),
             nAcceptsGlobal_(s.stacks * s.chains, 0),
@@ -59,8 +63,6 @@ namespace stateline
             acceptRates_(s.stacks * s.chains),
             swapRates_(s.stacks * s.chains),
             lowestEnergies_(s.stacks * s.chains),
-            chainmean_(s.stacks * s.chains),
-            chaincov_(s.stacks * s.chains),
             s_(s),
             recover_(d.recover),
             numOutstandingJobs_(0),
@@ -378,7 +380,7 @@ namespace stateline
       //! to the AM proposal function if we've got at least some target
       //! number of samples in this chain.
       uint amL = s_.adaptAMLength;
-      PropFn& adapt_propFn = ((amL > 0 && amL < chains_[id].length())
+      PropFn& adapt_propFn = ((amL > 0 && amL < lengths_[id])
               ? propFn : std::bind(&multiGaussianProposal, ph::_1, ph::_2, 0.0, 0.0));
       propStates_.row(id) = adapt_propFn(chains_.lastState(id).sample, chains_.sigma(id));
       policy.submit(id, propStates_.row(id));
@@ -482,11 +484,11 @@ namespace stateline
     //!
     void updateChaincov(uint id)
     {
-      uint k = chains_[id].length();
+      uint k = lengths_[id];
       if (k > 1)
       {
         // Declare a few elements to make this easier
-        Eigen::VectorXd Xk = chains.state(id, k-1).sample;
+        Eigen::VectorXd Xk = chains_.state(id, k-1).sample;
         int n = Xk.size();
         Eigen::MatrixXd eid = 1.0e-10*Eigen::MatrixXd::Identity(n, n);
         Eigen::VectorXd SXm = (k-1)*chainmean_[id];
@@ -494,7 +496,7 @@ namespace stateline
 
         // Update SXm and SX2m
         SXm += Xk;
-        SX2m += Xk*Xk.transpose():
+        SX2m += Xk*Xk.transpose();
 
         // Update mean and covariance
         chainmean_[id] = SXm/(1.0*k);

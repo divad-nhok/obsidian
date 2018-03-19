@@ -114,8 +114,8 @@ namespace stateline
 
       // Draw from a multivariate Gaussian
       Eigen::VectorXd zero_mean = 0.0*state;
-      distrib::MultiGaussian q(zero_mean, qcov);
-      return state + sigma*distrib::drawValues(q, generator);
+      obsidian::distrib::MultiGaussian q(zero_mean, qcov);
+      return state + sigma*obsidian::distrib::drawValues(q, generator);
     };
     
   }
