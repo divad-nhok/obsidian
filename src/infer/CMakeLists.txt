@@ -6,7 +6,9 @@
 # Date: 2014 
 
 ADD_LIBRARY(chainarray chainarray.cpp
-                       metropolis.cpp)
+                       metropolis.cpp
+                       adaptive.cpp
+)
                      
 ADD_EXECUTABLE(test-chainarray testchainarray.cpp)
 TARGET_LINK_LIBRARIES(test-chainarray chainarray db serial ${obsidianBaseLibraries})

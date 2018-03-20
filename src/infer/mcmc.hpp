@@ -197,7 +197,7 @@ namespace stateline
             // This chain is not locked, so we can propose
             try
             {
-              propose(policy, id, propFn);
+	      propose(policy, id, propFn);
             }
             catch (...)
             {
@@ -379,12 +379,18 @@ namespace stateline
       //! RS 2018/03/12:  If we're doing adaptive Metropolis, change over
       //! to the AM proposal function if we've got at least some target
       //! number of samples in this chain.
-      uint amL = s_.adaptAMLength;
-      PropFn& adapt_propFn = ((amL > 0 && amL < lengths_[id])
-              ? propFn : std::bind(&multiGaussianProposal, ph::_1, ph::_2, 0.0, 0.0));
-      propStates_.row(id) = adapt_propFn(chains_.lastState(id).sample, chains_.sigma(id));
-      policy.submit(id, propStates_.row(id));
-      numOutstandingJobs_++;
+
+	uint amL = s_.adaptAMLength;
+	if (amL > 0 && amL < lengths_[id]) {
+		propStates_.row(id) = propFn(chains_.lastState(id).sample, chains_.sigma(id),  chaincov_[id]);
+	} else {
+		Eigen::VectorXd min;
+		Eigen::VectorXd max;
+		auto adaptPropFn = std::bind(&mcmc::multiGaussianProposal, ph::_1, ph::_2, ph::_3,  min, max);
+		propStates_.row(id) = adaptPropFn(chains_.lastState(id).sample, chains_.sigma(id),  chaincov_[id]);
+	}
+	policy.submit(id, propStates_.row(id));
+	numOutstandingJobs_++;
     }
 
     //! Unlock a chain and reactivate any chains that were waiting for it.

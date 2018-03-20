@@ -34,7 +34,8 @@ namespace obsidian
         "proposal.minFactor", po::value<double>(), "minimum adaption factor")("proposal.optimalAccept", po::value<double>(),
                                                                               "optimal acceptance ratio")(
         "proposal.adaptRate", po::value<double>(), "controls the amount by which the proposal width changes")(
-        "proposal.adaptInterval", po::value<uint>(), "steps before proposal function re-adapts");
+        "proposal.adaptInterval", po::value<uint>(), "steps before proposal function re-adapts")(
+        "mcmc.adaptAMLength", po::value<uint>(), "steps before adaptive metropolis algorithm kicks in");
   }
 
   stateline::MCMCSettings parseMCMCSettings(const po::variables_map& vm)

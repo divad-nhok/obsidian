@@ -137,7 +137,7 @@ int main(int ac, char* av[])
   }
 
   
-  auto proposal = std::bind(&mcmc::adaptiveGaussianProposal,ph::_1, ph::_2,
+  auto proposal = std::bind(&mcmc::adaptiveGaussianProposal,ph::_1, ph::_2, ph::_3,
                             prior.world.thetaMinBound(), prior.world.thetaMaxBound()); 
   mcmc.run(policy, initialThetas, proposal, mcmcSettings.wallTime);
 
