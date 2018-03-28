@@ -140,6 +140,7 @@ namespace stateline
         auto lastPrintTime = steady_clock::now();
         while (duration_cast<seconds>(steady_clock::now() - startTime).count() < numSeconds && !interrupted_)
         {
+
           std::pair<uint, double> result;
 
           // Wait a for reply
@@ -160,6 +161,14 @@ namespace stateline
           uint id = result.first;
           double energy = result.second;
 
+	  LOG(INFO) << "pre-append lengths";
+	  LOG(INFO) << "id: " << id;
+          for (uint i = 0; i < chains_.numTotalChains(); i++)
+          {
+	   LOG(INFO) << "lengths_[" << i << "]: " << lengths_[id];
+	   LOG(INFO) << "chain_.length(" << i << "): " << chains_.length(i);
+          }
+
           // Check if this chain is either the coldest or the hottest
           bool isHottestChainInStack = id % chains_.numChains() == chains_.numChains() - 1;
           bool isColdestChainInStack = id % chains_.numChains() == 0;
@@ -169,6 +178,14 @@ namespace stateline
           bool propAccepted = chains_.append(id, propState);
           lengths_[id] += 1;
           updateAccepts(id, propAccepted);
+
+	  LOG(INFO) << "post-append lengths";
+	  LOG(INFO) << "id: " << id;
+          for (uint i = 0; i < chains_.numTotalChains(); i++)
+          {
+	   LOG(INFO) << "lengths_[" << i << "]: " << lengths_[id];
+	   LOG(INFO) << "chain_.length(" << i << "): " << chains_.length(i);
+          }
 
           // Update the convergence test if this is the coldest chain in a stack
           if (isColdestChainInStack && chains_.numChains() > 1 && chains_.numStacks() > 1)
@@ -213,6 +230,13 @@ namespace stateline
           lowestEnergies_[id] = std::min(lowestEnergies_[id], chains_.lastState(id).energy);
 
           // RS 2018/03/09:  Update the chain covariance.
+	  LOG(INFO) << "pre-updateChaincov lengths";
+	  LOG(INFO) << "id: " << id;
+          for (uint i = 0; i < chains_.numTotalChains(); i++)
+          {
+	   LOG(INFO) << "lengths_[" << i << "]: " << lengths_[id];
+	   LOG(INFO) << "chain_.length(" << i << "): " << chains_.length(i);
+          }
           updateChaincov(id);
 
           // Check if we need to adapt the step size for this chain
@@ -381,9 +405,12 @@ namespace stateline
       //! number of samples in this chain.
 
 	uint amL = s_.adaptAMLength;
-	if (amL > 0 && amL < lengths_[id]) {
+        LOG(INFO)<< "chains_.length(id): " << chains_.length(id);
+	if (amL > 0 && amL > lengths_[id]) {
+		LOG(INFO)<< "standard proposal";
 		propStates_.row(id) = propFn(chains_.lastState(id).sample, chains_.sigma(id),  chaincov_[id]);
 	} else {
+		LOG(INFO)<< "adaptive proposal";
 		Eigen::VectorXd min;
 		Eigen::VectorXd max;
 		auto adaptPropFn = std::bind(&mcmc::multiGaussianProposal, ph::_1, ph::_2, ph::_3,  min, max);
@@ -491,6 +518,7 @@ namespace stateline
     void updateChaincov(uint id)
     {
       uint k = lengths_[id];
+      LOG(INFO) << "lengths_[id] i.e. k: " << k;
       if (k > 1)
       {
         // Declare a few elements to make this easier
