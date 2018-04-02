@@ -166,7 +166,7 @@ namespace stateline
           for (uint i = 0; i < chains_.numTotalChains(); i++)
           {
 	   LOG(INFO) << "lengths_[" << i << "]: " << lengths_[id];
-	   LOG(INFO) << "chain_.length(" << i << "): " << chains_.length(i);
+	   LOG(INFO) << "chains_.length(" << i << "): " << chains_.length(i);
           }
 
           // Check if this chain is either the coldest or the hottest
@@ -184,7 +184,7 @@ namespace stateline
           for (uint i = 0; i < chains_.numTotalChains(); i++)
           {
 	   LOG(INFO) << "lengths_[" << i << "]: " << lengths_[id];
-	   LOG(INFO) << "chain_.length(" << i << "): " << chains_.length(i);
+	   LOG(INFO) << "chains_.length(" << i << "): " << chains_.length(i);
           }
 
           // Update the convergence test if this is the coldest chain in a stack
@@ -517,8 +517,11 @@ namespace stateline
     //!
     void updateChaincov(uint id)
     {
-      uint k = lengths_[id];
-      LOG(INFO) << "lengths_[id] i.e. k: " << k;
+      //uint k = lengths_[id];
+      uint k = chains_.length(id);
+      LOG(INFO) << "setting k";
+      LOG(INFO) << "lengths_[id]: " << lengths_[id];
+      LOG(INFO) << "chains_.length(id): " << chains_.length(id);
       if (k > 1)
       {
         // Declare a few elements to make this easier

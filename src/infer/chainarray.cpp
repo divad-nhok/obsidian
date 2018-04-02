@@ -137,6 +137,7 @@ namespace stateline
 
       cache_[id].back().accepted = accepted;
       if (cache_[id].size() == cacheLength_)
+      	LOG(INFO) << "flushing cache in append";
         flushCache(id);
 
       return accepted;
@@ -147,6 +148,7 @@ namespace stateline
       cache_[id].push_back(s);
       cache_[id].back().accepted = true;
       if (cache_[id].size() == cacheLength_)
+      	LOG(INFO) << "flushing cache in init";
         flushCache(id);
     }
 

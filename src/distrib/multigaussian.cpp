@@ -96,6 +96,9 @@ namespace obsidian
       Eigen::VectorXd means(nDims);
       means = input.mu;
       // Mu and nDraws are n*1 vectors
+      LOG(INFO)<< "means rows: " << means.rows() << " means cols: " << means.cols();
+      LOG(INFO)<< "input.sigL rows: " << input.sigL.rows() << " input.sigL cols: " << input.sigL.cols();
+      LOG(INFO)<< "randnDraws rows: " << randnDraws.rows() << " randnDraws cols: " << randnDraws.cols();
       Eigen::MatrixXd output = means + input.sigL * randnDraws;
       output.resize(input.shape.first, input.shape.second); // keeps the old memory unless the number of elements changes
       return output;
