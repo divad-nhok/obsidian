@@ -404,8 +404,10 @@ namespace stateline
       //! to the AM proposal function if we've got at least some target
       //! number of samples in this chain.
 
+	LOG(INFO)<< "propose function";
 	uint amL = s_.adaptAMLength;
         LOG(INFO)<< "chains_.length(id): " << chains_.length(id);
+        LOG(INFO)<< "lengths_[id]: " << lengths_[id];
 	if (amL > 0 && amL > lengths_[id]) {
 		LOG(INFO)<< "standard proposal";
 		propStates_.row(id) = propFn(chains_.lastState(id).sample, chains_.sigma(id),  chaincov_[id]);
@@ -537,7 +539,9 @@ namespace stateline
 
         // Update mean and covariance
         chainmean_[id] = SXm/(1.0*k);
+	LOG(INFO) << "chainmean: " << chainmean_[id];
         chaincov_[id] = (SX2m - SXm*SXm.transpose()/(1.0*k))/(1.0*k) + eid;
+	LOG(INFO) << "chaincov: " << chaincov_[id];
       }
     }
 
