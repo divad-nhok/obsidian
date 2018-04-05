@@ -22,12 +22,6 @@ namespace obsidian
 {
   namespace prior
   {
-    // RS 2018/03/22:  Maximum number of times WorldParamsPrior::sample()
-    // will sample out-of-bounds vectors before it gives up, and associated
-    // exception class.  Visible from header in case we want to catch it.
-    uint max_inbounds_sample_tries = 1000;
-    class ThetaBoundsError { };
-
     class WorldParamsPrior
     {
     public:

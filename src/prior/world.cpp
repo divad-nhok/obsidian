@@ -3,6 +3,7 @@
 #include <glog/logging.h>
 #include <cassert>
 #include <limits>
+#include <iostream>
 
 namespace obsidian
 {
@@ -164,22 +165,30 @@ namespace obsidian
       // RS 2018/03/22:  Keep drawing thetas until we get a parameter vector
       // with all the components within the given hard bounds.  Try at most
       // max_inbound_sample_tries times to avoid infinite loops.
+      uint max_inbounds_sample_tries = 1000;
+      class ThetaBoundsError { };
       uint i;
+      Eigen::VectorXd theta_draw;
+
       for (i = 0; i < max_inbounds_sample_tries; i++)
       {
-        WorldParams theta = { distrib::drawVectorFrom(propertyPrior, gen, propMins, propMaxs),
-                              distrib::drawFrom(ctrlptPrior, gen, ctrlptMins, ctrlptMaxs, uniformFlags) };
-        for (uint i = 0; i < theta.size(); i++)
-          if (theta[i] < thetaMin[i] or theta[i] > thetaMax[i])
-            continue;
-        return deconstruct(theta);
+        WorldParams prior_draw = { distrib::drawVectorFrom(propertyPrior, gen, propMins, propMaxs),
+                                   distrib::drawFrom(ctrlptPrior, gen, ctrlptMins, ctrlptMaxs, uniformFlags) };
+        theta_draw = deconstruct(prior_draw);
+        bool is_good_draw = 1;
+        for (uint i = 0; i < theta_draw.size(); i++)
+          if (theta_draw[i] < thetaMin[i] or theta_draw[i] > thetaMax[i])
+            is_good_draw = 0;
+        if (is_good_draw) return theta_draw;
       }
+
       // We didn't get a good draw, so throw an exception
       if (i == max_inbounds_sample_tries)
       {
-        std::cerr << "FATAL: couldn't draw valid prior vector in", maxtries, "tries";
-        throw OutOfBoundsError { }:
+        std::cout << "FATAL: couldn't draw valid prior vector in" << max_inbounds_sample_tries << "tries";
+        throw ThetaBoundsError { };
       }
+      return theta_draw;
     }
 
     // Evaluate log likelihood of theta under this prior
