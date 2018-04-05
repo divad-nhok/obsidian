@@ -1,12 +1,13 @@
 #include "prior/world.hpp"
 #include <Eigen/Core>
 #include <glog/logging.h>
+#include <cassert>
+#include <limits>
 
 namespace obsidian
 {
   namespace prior
   {
-
     uint prod(std::pair<uint, uint> in)
     {
       return in.first * in.second;
@@ -58,7 +59,6 @@ namespace obsidian
     {
       return thetaMax;
     }
-
 
     // used by sample... almost the same as size()
     Eigen::VectorXd WorldParamsPrior::deconstruct(const WorldParams& params)
@@ -160,9 +160,26 @@ namespace obsidian
       std::vector<bool> uniformFlags;
       for (auto i : classes)
         uniformFlags.push_back(i == BoundaryClass::Warped);
-      WorldParams theta = { distrib::drawVectorFrom(propertyPrior, gen, propMins, propMaxs), distrib::drawFrom(ctrlptPrior, gen, ctrlptMins,
-                                                                                                               ctrlptMaxs, uniformFlags) };
-      return deconstruct(theta);
+      
+      // RS 2018/03/22:  Keep drawing thetas until we get a parameter vector
+      // with all the components within the given hard bounds.  Try at most
+      // max_inbound_sample_tries times to avoid infinite loops.
+      uint i;
+      for (i = 0; i < max_inbounds_sample_tries; i++)
+      {
+        WorldParams theta = { distrib::drawVectorFrom(propertyPrior, gen, propMins, propMaxs),
+                              distrib::drawFrom(ctrlptPrior, gen, ctrlptMins, ctrlptMaxs, uniformFlags) };
+        for (uint i = 0; i < theta.size(); i++)
+          if (theta[i] < thetaMin[i] or theta[i] > thetaMax[i])
+            continue;
+        return deconstruct(theta);
+      }
+      // We didn't get a good draw, so throw an exception
+      if (i == max_inbounds_sample_tries)
+      {
+        std::cerr << "FATAL: couldn't draw valid prior vector in", maxtries, "tries";
+        throw OutOfBoundsError { }:
+      }
     }
 
     // Evaluate log likelihood of theta under this prior
@@ -173,6 +190,19 @@ namespace obsidian
       CHECK_EQ(ctrlptPrior.size(), nLayers);
       // Rebuild the vector into an object
       WorldParams wParams = reconstruct(theta);
+
+      // RS 2018/03/22:  If any of the thetas are out of bounds, this world
+      // has basically zero probability.  This is a blunt instrument, but it
+      // is needed for any MCMC proposal that isn't an independent Metropolis
+      // random walk to obey detailed balance at the parameter bounds.
+      // I'm not sure if we're IEEE 754 compliant but otherwise we'll have to
+      // pick some arbitrary large negative number which I could imagine
+      // giving unexpected results.  We'll also need range checks to ensure
+      // we don't *start* chains in regions of zero probability.
+      static_assert(std::numeric_limits<float>::is_iec559, "IEEE 754 required");
+      for (uint i = 0; i < theta.size(); i++)
+        if (theta[i] < thetaMin[i] or theta[i] > thetaMax[i])
+          return -std::numeric_limits<double>::infinity();
 
       // Now we go and check each of these against their prior
       double logPDF = 0.0;
