@@ -83,7 +83,8 @@ namespace stateline
       for (int i = 0; i < proposal.rows(); i++)
         proposal(i) = state(i) + rand(generator) * sigma;
 
-      return bouncyBounds(proposal, min, max);
+      //return bouncyBounds(proposal, min, max);
+      return(proposal);
     };
     
     //! RS 2018/03/09:  A multivariate Gaussian proposal function.
