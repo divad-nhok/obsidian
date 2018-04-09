@@ -9,6 +9,7 @@
 //!
 
 #include "adaptive.hpp"
+#include "glog/logging.h"
 
 namespace stateline
 {
@@ -82,8 +83,6 @@ namespace stateline
       Eigen::VectorXd proposal(state.rows());
       for (int i = 0; i < proposal.rows(); i++)
         proposal(i) = state(i) + rand(generator) * sigma;
-
-      //return bouncyBounds(proposal, min, max);
       return(proposal);
     };
     
@@ -112,7 +111,8 @@ namespace stateline
       Eigen::VectorXd zero_mean = 0.0*state;
 
       obsidian::distrib::MultiGaussian q(zero_mean, qcov);
-      return state + sigma*obsidian::distrib::drawValues(q, generator);
+      Eigen::VectorXd proposal = state + sigma*obsidian::distrib::drawValues(q, generator);
+      return(proposal);
     };
     
   }

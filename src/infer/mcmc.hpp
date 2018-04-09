@@ -183,6 +183,7 @@ namespace stateline
           {
             // Try swapping this chain with the one above it
             bool swapAccepted = chains_.swap(id, id + 1);
+	    LOG(INFO) << "swap between chains " << id << " and " << id + 1 << " " << swapAccepted;
             updateSwaps(id + 1, swapAccepted);
             // Unlock this chain, propgating the lock downwards
             unlock(policy, id, propFn);
@@ -191,6 +192,7 @@ namespace stateline
           {
             // The hottest chain is ready to swap. Lock the next chain
             // to prevent it from proposing any more
+	    LOG(INFO) << "locking chain " << id - 1;
             locked_[id - 1] = true;
           }
           else
@@ -198,6 +200,7 @@ namespace stateline
             // This chain is not locked, so we can propose
             try
             {
+	      LOG(INFO) << "proposal chain id: " << id;
 	      propose(policy, id, propFn);
             }
             catch (...)
@@ -384,13 +387,19 @@ namespace stateline
 	uint amL = s_.adaptAMLength;
 	if (amL > 0 && amL > lengths_[id]) {
 		LOG(INFO)<< "standard proposal";
-		propStates_.row(id) = propFn(chains_.lastState(id).sample, chains_.sigma(id),  chaincov_[id]);
+		propStates_.row(id) = propFn(
+		  chains_.lastState(id).sample, chains_.sigma(id),  chaincov_[id]
+		);
 	} else {
 		LOG(INFO)<< "adaptive proposal";
 		Eigen::VectorXd min;
 		Eigen::VectorXd max;
-		auto adaptPropFn = std::bind(&mcmc::multiGaussianProposal, ph::_1, ph::_2, ph::_3,  min, max);
-		propStates_.row(id) = adaptPropFn(chains_.lastState(id).sample, chains_.sigma(id),  chaincov_[id]);
+		auto adaptPropFn = std::bind(
+		  &mcmc::multiGaussianProposal, ph::_1, ph::_2, ph::_3,  min, max
+		);
+		propStates_.row(id) = adaptPropFn(
+		  chains_.lastState(id).sample, chains_.sigma(id),  chaincov_[id]
+		);
 	}
 	policy.submit(id, propStates_.row(id));
 	numOutstandingJobs_++;
@@ -421,6 +430,8 @@ namespace stateline
       else
       {
         // This is the coldest chain and there is no one to swap with
+
+
         propose(policy, id, propFn);
       }
     }
