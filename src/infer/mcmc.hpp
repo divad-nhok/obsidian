@@ -159,6 +159,7 @@ namespace stateline
 
           numOutstandingJobs_--;
           uint id = result.first;
+	  LOG(INFO) << "retrieved result for chain " << id;
           double energy = result.second;
 
           // Check if this chain is either the coldest or the hottest
@@ -386,12 +387,13 @@ namespace stateline
 
 	uint amL = s_.adaptAMLength;
 	if (amL > 0 && amL > lengths_[id]) {
-		LOG(INFO)<< "standard proposal";
+		LOG(INFO)<< "making standard proposal for chain " << id;
 		propStates_.row(id) = propFn(
 		  chains_.lastState(id).sample, chains_.sigma(id),  chaincov_[id]
 		);
+		LOG(INFO)<< "finished making standard proposal for chain " << id;
 	} else {
-		LOG(INFO)<< "adaptive proposal";
+		LOG(INFO)<< "making adaptive proposal for chain " << id;
 		Eigen::VectorXd min;
 		Eigen::VectorXd max;
 		auto adaptPropFn = std::bind(
@@ -400,6 +402,7 @@ namespace stateline
 		propStates_.row(id) = adaptPropFn(
 		  chains_.lastState(id).sample, chains_.sigma(id),  chaincov_[id]
 		);
+		LOG(INFO)<< "finished making adaptive proposal for chain " << id;
 	}
 	policy.submit(id, propStates_.row(id));
 	numOutstandingJobs_++;
@@ -415,23 +418,25 @@ namespace stateline
     void unlock(AsyncPolicy &policy, uint id, PropFn &propFn)
     {
       // Unlock this chain
+      LOG(INFO) << "unlocking chain " << id;
       locked_[id] = false;
 
       // The hotter chain no longer has to wait for this chain, so
       // it can propose new state
+      LOG(INFO) << "proposing in unlock function for chain " << id + 1;
       propose(policy, id + 1, propFn);
 
       // Check if this was the coldest chain
       if (id % chains_.numChains() != 0)
       {
         // Lock the chain that is below (colder) than this.
+	LOG(INFO) << "locking chain " << id - 1;
         locked_[id - 1] = true;
       }
       else
       {
         // This is the coldest chain and there is no one to swap with
-
-
+        LOG(INFO) << "proposing in unlock function for chain " << id;
         propose(policy, id, propFn);
       }
     }
@@ -588,8 +593,8 @@ namespace stateline
     Eigen::MatrixXd propStates_;
 
     // RS 2018/03/09:  Accumulated chain mean and covariance.
-    std::vector<Eigen::MatrixXd> chaincov_;
     std::vector<Eigen::VectorXd> chainmean_;
+    std::vector<Eigen::MatrixXd> chaincov_;
 
     // Whether a chain is locked. A locked chain will wait for any outstanding
     // job results and propagate the lock.
