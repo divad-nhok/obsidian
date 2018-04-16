@@ -32,6 +32,20 @@ def stats_table_line_list_transform(line_list, **kwargs):
     df = df.reindex(df.index.drop(0))
     return(df)
 
+def stats_table_line_list_transform(line_list, **kwargs):
+    new_line_list = line_list[2:]
+    new_line_list = [line.strip() for line in new_line_list]
+    new_line_list = [
+        [float(i) for i in line.split() if is_float_try(i)]
+        for line in new_line_list if line
+    ]
+    line_list = [line_list[2].split()] + new_line_list
+    line_list = [x for x in line_list if x]
+    df = pd.DataFrame(line_list)
+    df.columns = df.iloc[0]
+    df = df.reindex(df.index.drop(0))
+    return(df)
+
 # convergence stat functions
 def converged_line_list_transform(line_list, **kwargs):
     regex = '\((.*)[<|>]'

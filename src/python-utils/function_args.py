@@ -72,3 +72,17 @@ kwargs_statstable = dict(
     ),
     processing_func = lambda out: out
 )
+
+kwargs_statstable2 = dict(
+    file_search_str_list = ['obsidian.pbs.e', 'obsidian_error.txt'],
+    parse_error_log_args = dict(
+        start_signal_func_list = [
+            lambda line: misc_functions.string_in_line(line, 'mcmc.hpp:290')
+        ],
+        end_signal_func_list = [
+            lambda line: misc_functions.string_in_line(line, 'I0')
+        ],
+        line_list_transform_func = misc_functions.stats_table_line_list_transform,
+    ),
+    processing_func = lambda out: out
+)

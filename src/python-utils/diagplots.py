@@ -81,8 +81,10 @@ def plot_sensor(sensors, readings, chain, sample=None, units='unknown units', pl
 
     # Contour map of residuals in f
     plt.subplot(2, 1, 1)
+    # filled contours with real sensor data
     plt.contourf(xgrid, ygrid, dgrid, alpha=0.5)
     plt.colorbar()
+    # line contours with forward model sensor data
     plt.contour(xgrid, ygrid, fgrid, colors='k')
     plt.xlabel("Eastings (m)")
     plt.ylabel("Northings (m)")
@@ -204,6 +206,7 @@ def main_contours(
                 units=unit,
                 plot_fpath=os.path.join(save_dir, plot_name)
             )
+            plt.clf()
 
 def main_boundarymovie(parent_dir = ''):
     """
@@ -223,6 +226,79 @@ def main_boundarymovie(parent_dir = ''):
         gp_predict(gravSensors, layer_pars, ((0.0, 2e+4), (0.0, 2e+4)))
         plt.savefig('boundary_movie_frame{:04d}.png'.format(i))
         plt.close()
+
+def parameters_plot(
+    samples, 
+    key,
+    rows, cols,
+    fig_width, fig_height,
+    fontsize = 20,
+    plot_type = 'hist', # 'hist' or 'trace'
+    plot_extension = 'png',
+    save_dir = ''
+):
+    vals = samples[key]
+    #print('vals.shape: {}'.format(vals.shape))
+    n = vals.shape[1]
+    iterations = range(vals.shape[0])
+    total = rows * cols
+
+    fig, axes = plt.subplots(
+        rows, cols, 
+        figsize = (fig_width, fig_height)
+    )
+
+    fig.add_subplot(111, frameon=False)
+    plt.tick_params(
+        labelcolor='none', top='off', bottom='off', left='off', right='off'
+    )
+    plt.grid(False)
+
+    if plot_type == 'hist': 
+        xstr = 'Parameter value bin'
+        ystr = 'Frequency'
+        title_str = 'Histogram for {}'
+        save_str = 'hist-{}' + '.{}'.format(plot_extension)
+    elif plot_type == 'trace':
+        xstr = 'MCMC iteration'
+        ystr = 'Parameter value'
+        title_str = 'Trace plots for {}'
+        save_str = 'trace-plots-{}' + '.{}'.format(plot_extension)
+
+    plt.xlabel(
+        xstr,
+        fontsize = fontsize
+    )
+    plt.ylabel(
+        ystr,
+        fontsize = fontsize
+    )
+
+    plot_i = 0
+    for row_idx in range(rows):
+        for col_idx in range(cols):
+            if plot_i < n:
+                #print(plot_i, row_idx, col_idx)
+                x = vals[:, plot_i]
+                if plot_type == 'hist':
+                    axes[row_idx][col_idx].hist(x)
+                elif plot_type == 'trace':
+                    axes[row_idx][col_idx].plot(iterations, x)
+            else:
+                axes[row_idx][col_idx].set_visible(False)
+            plot_i += 1
+
+    #plt.tight_layout()
+    # see https://github.com/pandas-dev/pandas/issues/9351 for tight_layout issues
+    plt.title(
+        title_str.format(key),
+        fontsize = fontsize
+    )
+    save_path = os.path.join(
+        save_dir, save_str.format(key)
+    )
+    plt.savefig(save_path)
+    plt.clf()
 
 if __name__ == "__main__":
     main_contours()

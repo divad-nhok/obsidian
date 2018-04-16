@@ -62,7 +62,6 @@ def parse_error_log(
     
     with open(fpath, 'r') as f:
         for idx, line in enumerate(f):
-            line = f.readline()
             if (not recording):
                 evaluation_list = [
                     start_signal_func(line) 
@@ -75,11 +74,12 @@ def parse_error_log(
                     recording = True
                     line_list = []
             elif end_signal_func(line):
-                recording = False
-                end_signal_func = end_signal_func_standard
-                if kwargs.get('line_list_transform_func'):
-                    line_list = kwargs.get('line_list_transform_func')(line_list, **kwargs)
-                output_list.append(line_list)
+                if recording:
+                    recording = False
+                    end_signal_func = end_signal_func_standard
+                    if kwargs.get('line_list_transform_func'):
+                        line_list = kwargs.get('line_list_transform_func')(line_list, **kwargs)
+                    output_list.append(line_list)
             if recording:
                 if kwargs.get('line_transform_func'):
                     line = kwargs.get('line_transform_func')(line, **kwargs)
