@@ -49,7 +49,12 @@ kwargs_convergence = dict(
     file_search_str_list = ['obsidian.pbs.e', 'obsidian_error.txt'],
     parse_error_log_args = dict(
         start_signal_func_list = [
-            lambda line: misc_functions.string_in_line(line, 'mcmc.hpp:252')
+            lambda line: misc_functions.strings_in_line(
+                line, 
+                [
+                    'mcmc.hpp:270',
+                ]
+            )
         ],
         end_signal_func_list = [
             misc_functions.end_on_same_line
@@ -63,10 +68,15 @@ kwargs_statstable = dict(
     file_search_str_list = ['obsidian.pbs.e', 'obsidian_error.txt'],
     parse_error_log_args = dict(
         start_signal_func_list = [
-            lambda line: misc_functions.string_in_line(line, 'mcmc.hpp:242')
+            lambda line: misc_functions.strings_in_line(
+                line, 
+                [
+                    'mcmc.hpp:260',
+                ]
+            )
         ],
         end_signal_func_list = [
-            misc_functions.end_if_new_line
+            lambda line: misc_functions.string_in_line(line, 'I0')
         ],
         line_list_transform_func = misc_functions.stats_table_line_list_transform,
     ),

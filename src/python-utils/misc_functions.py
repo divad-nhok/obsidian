@@ -9,6 +9,10 @@ def string_in_line(line, string):
     evaluation = string in line
     return(evaluation)
 
+def strings_in_line(line, strings):
+    evaluation = np.any([string in line for string in strings])
+    return(evaluation)
+
 def end_on_same_line(line):
     evaluation = True
     return(evaluation)
