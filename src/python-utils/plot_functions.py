@@ -70,3 +70,50 @@ def make_convergence_plot(
             out_path
         )
         plt.clf()
+
+def make_rhat_plot(
+    data,
+    curr_dir,
+    fig_width = 20,
+    fig_height = 20,
+    xstr = 'MCMC iteration',
+    ystr = 'Rhat',
+    title_str = 'Rhat over MCMC iterations for all chains',
+    save_str = 'rhat_iterations',
+    fontsize = 20,
+    start_slice_idx = 100
+):
+    # rhat plot
+    param_range = data.shape[0]
+
+    fig = plt.figure(
+	figsize = (fig_width, fig_height)
+    )
+    ax = fig.gca()
+    for param_idx in range(param_range):
+        y = c[param_idx,:]
+        y = y[~np.isnan(y)]
+        x = range(len(y))
+        idx = slice(start_slice_idx, len(y))
+        plt.plot(x[idx], y[idx])
+	
+    plt.xlabel(
+	xstr,
+	fontsize = fontsize
+    )
+    plt.ylabel(
+	ystr,
+	fontsize = fontsize
+    )
+    plt.title(
+	title_str,
+	fontsize = fontsize
+    )
+    out_path = os.path.join(
+	curr_dir, 
+	save_str
+    )
+    plt.savefig(
+	out_path
+    )
+    plt.clf()

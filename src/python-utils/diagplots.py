@@ -74,6 +74,7 @@ def plot_sensor(sensors, readings, chain, sample=None, units='unknown units', pl
 
     # Reshape sensors and readings to an automatically detected grid shape
     gridshape = autoshape(sensors)
+    print('gridshape: {}'.format(gridshape))
     xgrid = x.reshape(*gridshape)
     ygrid = y.reshape(*gridshape)
     dgrid = d.reshape(*gridshape)

@@ -45,14 +45,14 @@ kwargs_evaluationtime = dict(
     )
 )
 
-kwargs_convergence = dict(
+kwargs_convergence = lambda line_no : dict(
     file_search_str_list = ['obsidian.pbs.e', 'obsidian_error.txt'],
     parse_error_log_args = dict(
         start_signal_func_list = [
             lambda line: misc_functions.strings_in_line(
                 line, 
                 [
-                    'mcmc.hpp:270',
+                    'mcmc.hpp:{}'.format(line_no),
                 ]
             )
         ],
@@ -64,14 +64,14 @@ kwargs_convergence = dict(
     processing_func = lambda out: np.stack(out, axis = 0)
 )
 
-kwargs_statstable = dict(
+kwargs_statstable = lambda line_no : dict(
     file_search_str_list = ['obsidian.pbs.e', 'obsidian_error.txt'],
     parse_error_log_args = dict(
         start_signal_func_list = [
             lambda line: misc_functions.strings_in_line(
                 line, 
                 [
-                    'mcmc.hpp:260',
+                    'mcmc.hpp:{}'.format(line_no),
                 ]
             )
         ],
