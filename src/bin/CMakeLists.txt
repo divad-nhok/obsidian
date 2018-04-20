@@ -121,6 +121,15 @@ TARGET_LINK_LIBRARIES(mason ${obsidianServerLibraries}
                             ${obsidianBaseLibraries})
 
 SET_TARGET_PROPERTIES (mason PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OBSIDIAN_BINARY_DIR})
+############################################################################
+# Gridsearch
+############################################################################
+ADD_EXECUTABLE(gridsearch gridsearch.cpp)
+TARGET_LINK_LIBRARIES(gridsearch ${obsidianServerLibraries}
+                              ${obsidianAlgoLibraries}
+                              ${obsidianBaseLibraries})
+
+SET_TARGET_PROPERTIES (gridsearch PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OBSIDIAN_BINARY_DIR})
 
 # Macro for adding demos
 FUNCTION (ADD_DEMO demoName)
