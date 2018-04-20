@@ -91,7 +91,7 @@ def make_rhat_plot(
     )
     ax = fig.gca()
     for param_idx in range(param_range):
-        y = c[param_idx,:]
+        y = data[param_idx,:]
         y = y[~np.isnan(y)]
         x = range(len(y))
         idx = slice(start_slice_idx, len(y))
