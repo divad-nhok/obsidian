@@ -168,6 +168,8 @@ def load_data(parent_dir):
         ("magReadings", ".csv"),
         ("gravSensors", ".csv"),
         ("gravReadings", ".csv"),
+        ("fieldSensors", ".csv"),
+        ("fieldReadings", ".csv"),
         ("output", ".npz")
     ]
     data_dict = {}
@@ -194,7 +196,8 @@ def main_contours(
     # tuple format = (sensor key, reading key, samples key, unit, plot file name)
     plot_key_tuple_list = [
         ('magSensors', 'magReadings', 'output', 'nT', 'mag_contours'),
-        ('gravSensors', 'gravReadings', 'output', 'mgal', 'grav_contours')
+        ('gravSensors', 'gravReadings', 'output', 'mgal', 'grav_contours'),
+        ('fieldSensors', 'fieldReadings', 'output', '???', 'fieldobs_contours'),
     ]
     # Make a few plots of sensors
     for sensor_key, reading_key, output_key, unit, plot_name in plot_key_tuple_list:
@@ -209,7 +212,10 @@ def main_contours(
             )
             plt.clf()
 
-def main_boundarymovie(parent_dir = ''):
+def main_boundarymovie(
+    parent_dir = '',
+    layers = 3
+):
     """
     Makes a movie of how the boundaries change as the chain samples
     """
@@ -220,7 +226,7 @@ def main_boundarymovie(parent_dir = ''):
     gravSensors = data_dict.get('gravSensors')
 
     # Try fitting a few GP layers
-    layer_labels = ['layer{}ctrlPoints'.format(i) for i in range(4)]
+    layer_labels = ['layer{}ctrlPoints'.format(i) for i in range(layers)]
     for i in np.arange(0, 2500, 25):
         layer_pars = np.array([samples[ll][i] for ll in layer_labels]).reshape(4,5,5)
         fig = plt.figure()
