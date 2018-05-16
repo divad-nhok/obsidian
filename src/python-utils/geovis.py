@@ -150,10 +150,10 @@ class MasonView(object):
 
 
 if __name__ == "__main__":
-    print "Initializing from", args.npzfname[0]
+    print("Initializing from", args.npzfname[0])
     view = MasonView(args.npzfname[0])
     for fn in args.npzfname[1:]:
-        print "Adding samples from", fn
+        print("Adding samples from", fn)
         view.add_samples(MasonView(fn))
     for i in range(len(view.layers)):
         view.show_vox(lambda v: MasonView.meanlayer(v, i))
