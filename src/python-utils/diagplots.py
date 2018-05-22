@@ -40,18 +40,18 @@ def plot_sensor(sensors, readings, chain, sample=None,
     x, y, z = sensors.T
     d = readings - readings.mean()
     if sample is None:
-        print "Averaged fwd models over chain of shape", chain.shape
+        print("Averaged fwd models over chain of shape", chain.shape)
         f = chain.mean(axis=0) - chain.mean()
     elif not isinstance(sample, int):
-        print "ERROR:  sample = {} is of type {}, not int".format(
-            sample, sample.__class__)
+        print("ERROR:  sample = {} is of type {}, not int".format(
+            sample, sample.__class__))
         return
     elif abs(sample) > len(chain):
-        print "ERROR:  sample = {} not in range ({}, {})".format(
-                sample, -len(chain), len(chain))
+        print("ERROR:  sample = {} not in range ({}, {})".format(
+                sample, -len(chain), len(chain)))
         return
     else:
-        print "Picking sample", sample, "from chain of shape", chain.shape
+        print("Picking sample", sample, "from chain of shape", chain.shape)
         f = chain[sample] - chain[sample].mean()
 
     # Contour map of residuals in f
