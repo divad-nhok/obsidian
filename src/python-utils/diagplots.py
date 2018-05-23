@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import os
 
 """
 RS 2018/02/23:  Digesting Obsidian Output
@@ -55,7 +56,7 @@ def plot_sensor(sensors, readings, chain, sample=None,
         f = chain[sample] - chain[sample].mean()
 
     # Contour map of residuals in f
-    fig = plt.figure(figsize=(6,7))
+    fig = plt.figure(figsize=(10,10))
     ax1 = plt.subplot2grid((3,1), (0,0), rowspan=2)
     plt.tricontourf(x, y, d, alpha=0.5, label='Data')
     plt.colorbar()
@@ -113,51 +114,63 @@ def fieldobs_lookup(readings):
             readstr.append('Unknown layer')
     return readstr
 
-def main_contours():
+def main_contours(
+    parent_dir = '',
+    runtag = 'gascoyne_v3'
+):
     """
     The main routine to run a suite of diagnostic plots
     """
 
     # Load everything
-    magSensors = np.loadtxt("magSensors.csv", delimiter=',')
-    magReadings = np.loadtxt("magReadings.csv", delimiter=',')
-    gravSensors = np.loadtxt("gravSensors.csv", delimiter=',')
-    gravReadings = np.loadtxt("gravReadings.csv", delimiter=',')
-    samples = np.load(runtag + ".npz")
-    N = len(samples['magReadings'])
+    magSensors = np.loadtxt(os.path.join(parent_dir, "magSensors.csv"), delimiter=',')
+    magReadings = np.loadtxt(os.path.join(parent_dir, "magReadings.csv"), delimiter=',')
+    gravSensors = np.loadtxt(os.path.join(parent_dir, "gravSensors.csv"), delimiter=',')
+    gravReadings = np.loadtxt(os.path.join(parent_dir, "gravReadings.csv"), delimiter=',')
+    samples = np.load(os.path.join(parent_dir, runtag) + ".npz")
 
     # Make a few plots of sensors
-    plot_sensor(magSensors, magReadings, samples['magReadings'][N/2:],
-                units='nT', show=False)
-    plt.savefig('mag_contours.png')
-    plot_sensor(gravSensors, gravReadings, samples['gravReadings'][N/2:],
-                units='mgal', show=False)
-    plt.savefig('grav_contours.png')
+    N,N2 = samples['magReadings'].shape
+    print(N,N2)
+    if N2 > 0:
+        plot_sensor(magSensors, magReadings, samples['magReadings'][N/2:],
+                    units='nT', show=False)
+        plt.savefig(os.path.join(parent_dir, 'mag_contours.png'))
 
-def main_fieldobs():
+    N,N2 = samples['gravReadings'].shape
+    print(N,N2)
+    if N2 > 0:
+        plot_sensor(gravSensors, gravReadings, samples['gravReadings'][N/2:],
+                    units='mgal', show=False)
+        plt.savefig(os.path.join(parent_dir, 'grav_contours.png'))
+
+def main_fieldobs(
+    parent_dir = '',
+    runtag = 'gascoyne_v3'
+):
     """
     The main routine to show simulated field observations
     """
 
     # First show the data we expect
-    fieldSensors = pd.read_csv('fieldobsSensors.csv', names=['x','y'], comment='#')
-    fieldReadings = pd.read_csv('fieldobsReadings.csv', names=['val'], comment='#')
+    fieldSensors = pd.read_csv(os.path.join(parent_dir,'fieldSensors.csv'), names=['x','y'], comment='#')
+    fieldReadings = pd.read_csv(os.path.join(parent_dir,'fieldReadings.csv'), names=['val'], comment='#')
     fieldLabels = fieldSensors.assign(val=fieldobs_lookup(fieldReadings.val))
-    fig = plt.figure(figsize=(6,6))
+    fig = plt.figure(figsize=(10,10))
     display_ground_truth(fieldLabels, show=False)
     plt.title('Field Observations'.format(runtag))
-    plt.savefig('boundary_data.png')
+    plt.savefig(os.path.join(parent_dir, 'boundary_data.png'))
 
     # Now show samples
-    samples = np.load(runtag + ".npz")
-    fig = plt.figure(figsize=(6,6))
+    samples = np.load(os.path.join(parent_dir, runtag + ".npz"))
+    fig = plt.figure(figsize=(10,10))
     i = len(samples['fieldReadings'])
     readings = samples['fieldReadings'][i-1]
     fieldLabels.val = fieldobs_lookup(readings)
     display_ground_truth(fieldLabels, show=False)
     plt.title('Forward-Modeled Field Observations, '
               'Sample {} from MCMC Chain'.format(i))
-    plt.savefig('boundary_fwdmodel_endchain.png')
+    plt.savefig(os.path.join(parent_dir,'boundary_fwdmodel_endchain.png'))
     plt.close()
 
 def main_boundarymovie():
