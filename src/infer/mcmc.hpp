@@ -470,7 +470,8 @@ namespace stateline
       double scale = oldSize/(double)newSize;
       acceptRates_[id] = std::max(oldRate*scale + delta, 0.0);
       nAcceptsGlobal_[id] += acc;
-      if (acceptRates_[id] > 1.0)
+      double comparison = 1.0 + (0.5/newSize);
+      if (acceptRates_[id] > comparison)
       {
         std::cout << "oldSize: " << oldSize << "\n"
         << "isFull:" << isFull << "\n"

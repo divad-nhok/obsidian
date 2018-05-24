@@ -174,24 +174,14 @@ namespace stateline
       State lastState = cache_[id].back();
 
       // Don't put the front state in
-      if (id % numChains() == 0)
+      for (uint i = 1; i < cacheLength; i++)
       {
-        for (uint i = 1; i < cacheLength; i++)
-        {
-          uint index = diskLength + i - 1;
-          batch.Put(internal::toDbString(id, index, internal::DbEntryType::STATE), comms::serialise(cache_[id][i]));
-        }
-        uint newLength = diskLength + cacheLength - 1; // no front state
-        batch.Put(internal::toDbString(id, internal::DbEntryType::LENGTH), leveldb::Slice((char*) &newLength, sizeof(uint) / sizeof(char)));
-        VLOG(3) << "Flushing cache of chain " << id << ". new length: " << newLength;
-      } else
-      {
-        uint index = 0;
-        batch.Put(internal::toDbString(id, index, internal::DbEntryType::STATE), comms::serialise(cache_[id][cacheLength - 1]));
-        VLOG(3) << "Overwriting high temperature state of chain " << id;
-        uint newLength = 1; // no front state
-        batch.Put(toDbString(id, internal::DbEntryType::LENGTH), leveldb::Slice((char*) &newLength, sizeof(uint) / sizeof(char)));
+        uint index = diskLength + i - 1;
+        batch.Put(internal::toDbString(id, index, internal::DbEntryType::STATE), comms::serialise(cache_[id][i]));
       }
+      uint newLength = diskLength + cacheLength - 1; // no front state
+      batch.Put(internal::toDbString(id, internal::DbEntryType::LENGTH), leveldb::Slice((char*) &newLength, sizeof(uint) / sizeof(char)));
+      VLOG(3) << "Flushing cache of chain " << id << ". new length: " << newLength;
 
       // Update sigma and beta
       double sigma = sigma_[id];

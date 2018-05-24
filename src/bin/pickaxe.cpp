@@ -136,21 +136,21 @@ int main(int ac, char* av[])
   uint nthin = vm["nthin"].as<uint>();
   uint burnin = vm["burnin"].as<uint>();
 
-  std::vector<WorldParams> dumpParams;
-  std::vector<double> dumpPrior;
-  std::vector<double> dumpEnergy;
-  std::vector<Eigen::VectorXd> dumpTheta;
-
   // Forward modelling stuff
   bool computeForwardModels = vm["fwdmodel"].as<bool>();
   std::vector<GlobalResults> dumpResults;
   std::vector<std::vector<double>> dumpLikelihood;
 
   std::string filename = vm["outputfile"].as<std::string>();
-  io::NpzWriter writer(filename);
   bool quit = false;
-  for (uint id = 0; id < chains.numTotalChains(); id+=chains.numChains())
+  for (uint id = 0; id < chains.numTotalChains(); id+=1)
   {
+    std::string filename_id = "output" + std::to_string(id) + ".npz";
+    io::NpzWriter writer(filename_id);
+    std::vector<WorldParams> dumpParams;
+    std::vector<double> dumpPrior;
+    std::vector<double> dumpEnergy;
+    std::vector<Eigen::VectorXd> dumpTheta;
     // This is the coldest chain in a stack, so we can directly use its samples.
     for (uint i = burnin; i < chains.length(id); i += nthin + 1)
     {
@@ -179,19 +179,19 @@ int main(int ac, char* av[])
         dumpLikelihood.push_back(likelihoods); 
       }
     }
+    dumpParamsNPZ(writer, dumpParams);
+    dumpPriorNPZ(writer, dumpPrior);
+    dumpEnergyNPZ(writer, dumpEnergy);
+    dumpThetaNPZ(writer, dumpTheta);
+  
+    if (computeForwardModels)
+    {
+      dumpResultsNPZ(writer, dumpResults);
+      dumpLikelihoodNPZ(writer, dumpLikelihood);
+    }
+  
     if (quit)
       break;
-  }
-
-  dumpParamsNPZ(writer, dumpParams);
-  dumpPriorNPZ(writer, dumpPrior);
-  dumpEnergyNPZ(writer, dumpEnergy);
-  dumpThetaNPZ(writer, dumpTheta);
-
-  if (computeForwardModels)
-  {
-    dumpResultsNPZ(writer, dumpResults);
-    dumpLikelihoodNPZ(writer, dumpLikelihood);
   }
 
   return 0;
