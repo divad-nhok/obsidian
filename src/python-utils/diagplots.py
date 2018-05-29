@@ -9,10 +9,11 @@ Plots we want to see:
     Contour maps of residuals between forward models and data
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
 import GPy
+import matplotlib.pyplot as plt
+import numpy as np
 import os
+import statsmodels.graphics.tsaplots as sm
 
 def autoshape(sensors):
     """
@@ -266,6 +267,17 @@ def parameters_plot(
         ystr = 'Frequency'
         title_str = 'Histogram for {}'
         save_str = 'hist-{}' + '.{}'.format(plot_extension)
+    elif plot_type == 'acf':
+        # see https://machinelearningmastery.com/gentle-introduction-autocorrelation-partial-autocorrelation/
+        xstr = 'Lag'
+        ystr = 'Autocorrelation'
+        title_str = 'Autocorrelation for {}'
+        save_str = 'acf-plots-{}' + '.{}'.format(plot_extension)
+    elif plot_type == 'pacf':
+        xstr = 'Lag'
+        ystr = 'Partial autocorrelation'
+        title_str = 'partial autocorrelation for {}'
+        save_str = 'pacf-plots-{}' + '.{}'.format(plot_extension)
     elif plot_type == 'trace':
         xstr = 'MCMC iteration'
         ystr = 'Parameter value'
@@ -289,6 +301,21 @@ def parameters_plot(
                 x = vals[:, plot_i]
                 if plot_type == 'hist':
                     axes[row_idx][col_idx].hist(x)
+                elif plot_type == 'acf':
+                    sm.plot_acf(
+                        x, lags = 50, 
+                        ax = axes[row_idx][col_idx],
+                        title = ''
+                    )
+                elif plot_type == 'pacf':
+                    try:
+                        sm.plot_pacf(
+                            x, lags = 50, 
+                            ax = axes[row_idx][col_idx],
+                            title = ''
+                        )
+                    except:
+                        pass
                 elif plot_type == 'trace':
                     axes[row_idx][col_idx].plot(iterations, x)
             else:
