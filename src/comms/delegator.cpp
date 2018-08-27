@@ -41,6 +41,7 @@ namespace stateline
 
       // Initialise the network socket
       std::string address = "tcp://*:" + std::to_string(settings.port);
+      LOG(INFO)<< "Delegator listening on " << address;
       network->bind(address.c_str());
       LOG(INFO)<< "Delegator listening on " << address;
 

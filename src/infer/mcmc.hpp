@@ -99,8 +99,8 @@ namespace stateline
         using namespace std::chrono;
 
         // Used for publishing statistics to visualisation server.
-        zmq::socket_t publisher(context_, ZMQ_PUB);
-        publisher.bind("tcp://*:5556");
+        //zmq::socket_t publisher(context_, ZMQ_PUB);
+        //publisher.bind("tcp://*:5556");
 
         // Record the starting time of the MCMC
         steady_clock::time_point startTime = steady_clock::now();
@@ -238,7 +238,7 @@ namespace stateline
             }
 
             // Quick and dirty way to get the data to the visualisation server
-            comms::sendString(publisher, s.str());
+            //comms::sendString(publisher, s.str());
 
             if (duration_cast<milliseconds>(steady_clock::now() - lastPrintTime).count() > 500)
             {
@@ -470,7 +470,9 @@ namespace stateline
       double scale = oldSize/(double)newSize;
       acceptRates_[id] = std::max(oldRate*scale + delta, 0.0);
       nAcceptsGlobal_[id] += acc;
-      if (acceptRates_[id] > 1.0)
+      //double comparison = 1.0 + (0.5/newSize);
+      double comparison = 1.0;
+      if (acceptRates_[id] > comparison)
       {
         std::cout << "oldSize: " << oldSize << "\n"
         << "isFull:" << isFull << "\n"

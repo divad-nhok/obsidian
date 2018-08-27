@@ -1,0 +1,12 @@
+# Leftover editor files
+.*.swp
+*~
+# Analysis products, not to be committed
+*.png
+*.npz
+# Python byte-compiled code
+*.pyc
+# Tarballs of e.g. intermediate configurations
+*.tar
+*.tar.gz
+*.tgz

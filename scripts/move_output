@@ -1,0 +1,5 @@
+for num in 01 02 03 04 05 06
+do
+	echo $num
+	mv $num/output.npz $num/output0.npz
+done

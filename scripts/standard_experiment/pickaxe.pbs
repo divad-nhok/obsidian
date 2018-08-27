@@ -1,0 +1,6 @@
+#!/bin/bash
+ulimit -c unlimited
+module load gcc/4.9.3
+cd $dir_project
+echo "pickaxe job started at: `date`" >> $log_file
+$dir_build/pickaxe --burnin=$burnin --nthin=$nthin -l-4 -f true -o $output_file

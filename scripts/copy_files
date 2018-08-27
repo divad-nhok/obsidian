@@ -1,0 +1,3 @@
+d=XX;e=XX_XX_2018;cp ../$e/$d/*.pbs $d;cp ../$e/$d/*.csv $d;cp ../$e/$d/input.obsidian $d; cp ../$e/$d/run_experiment.sh $d;cp ../$e/$d/obsidian_config $d;
+d=XX;e=XX_XX_2018;cp ../$e/$d/*.pbs $d;cp ../$e/$d/*.csv $d;cp ../$e/$d/input.obsidian $d; cp ../$e/$d/run_experiment.sh $d;cp ../$e/$d/obsidian_config $d;
+in=XXX;out=YYY;cp $in/*.pbs $out;cp $in/*.csv $out;cp $in/input.obsidian $out; cp $in/run_experiment.sh $out;cp $in/obsidian_config $out;

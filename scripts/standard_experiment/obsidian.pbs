@@ -1,0 +1,11 @@
+#!/bin/bash
+ulimit -c unlimited
+module load gcc/4.9.3
+cd $dir_project
+bash -c '[ -d chainDB ] && rm -r chainDB'
+cat $PBS_NODEFILE > $dir_project/obsidian_node.log
+echo "obsidian job started at: `date`" >> $log_file
+echo "port: ${port}" >> $log_file
+echo $dir_build/obsidian
+$dir_build/obsidian -l -4 -p "$port" -a "$anneal_length"
+echo "obsidian job ended at: `date`" >> $log_file

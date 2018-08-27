@@ -1,0 +1,12 @@
+rds_path=/rds/PRJ-SIH4HPC/obsidian/experiments/07_20_2018
+for num in 01 02 03 04 05 06
+do
+	echo $num
+	mkdir -p $num
+	exp_path=$rds_path/$num
+	cp $exp_path/*.csv $num
+	cp $exp_path/*.pbs $num
+	cp $exp_path/input.obsidian $num
+	cp $exp_path/obsidian_config $num
+	cp $exp_path/run_experiment.sh $num
+done

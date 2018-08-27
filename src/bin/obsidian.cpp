@@ -163,6 +163,8 @@ int main(int ac, char* av[])
 		mcmcSettings.ro, prior
 	  );
 	  mcmc.run(policy, initialThetas, proposal, proposalPDF, mcmcSettings.wallTime);
+  } else {
+	LOG(INFO) << "no valid proposal string selected";
   }
 
   // This will gracefully stop all delegators internal threads

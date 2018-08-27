@@ -1,0 +1,8 @@
+#!/bin/bash
+ulimit -c unlimited
+module load python/3.6.5
+
+path_geovis_func=/project/RDS-FSC-obsidian-RW/obsidian-dk/test_mason_voxelization/get_mean_posterior.py
+#dir_voxels=/project/RDS-FSC-obsidian-RW/obsidian-dk/test_mason_voxelization
+cd $dir_voxels
+python $path_geovis_func $dir_voxels $dir_voxels

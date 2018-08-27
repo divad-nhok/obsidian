@@ -1,0 +1,9 @@
+#!/bin/bash
+ulimit -c unlimited
+module load gcc/4.9.3
+cd $dir_project
+obsidian_node=$(<$dir_project/obsidian_node.log)
+shard_job=`echo ${PBS_JOBID} | grep -oP "\K([0-9]+)"`
+echo "shard job ${shard_job} started at: `date` on port ${port}" >> $log_file
+$dir_build/shard --nthreads "$threads" --a "${obsidian_node}:${port}"
+echo "shard job ${shard_job} ended at: `date`" >> $log_file

@@ -48,8 +48,11 @@ def select_volume(data, lng, lat, L):
     v = data.val.values[idx]
     return x, y, v
 
-def write_sensor_data(data, lng, lat, L, stag,
-                      rhdr="", shdr="", zval=-0.5, axthin=1):
+def write_sensor_data(
+   data, lng, lat, L, stag,
+   rhdr="", shdr="", zval=-0.5, axthin=1,
+   zkey=False
+):
     """
     Given a dataframe with sensor readings at (lng, lat) locations,
     write output to Obsidian-readable "Readings" and "Sensors" files.
@@ -65,6 +68,7 @@ def write_sensor_data(data, lng, lat, L, stag,
     :param shdr:  string header to write to top of Sensors file
     :param zval:  depth of sensors (assumed constant, +z is down)
     :param axthin:  int, take every (axthin)th reading along each axis
+    :param zkey: Bool, whether there is a z-key for the dataframe `data`
     """
     # Project all latitudes and longitudes to Web Mercator coordinates,
     # selecting only those measurements lying in the volume to render.
@@ -74,6 +78,7 @@ def write_sensor_data(data, lng, lat, L, stag,
     x = x[idx] + 0.5*L
     y = y[idx] + 0.5*L
     v = data.val.values[idx]
+    if zkey: z = data.z.values[idx]
 
     # Subsampling on a grid
     if axthin > 1:
@@ -81,13 +86,15 @@ def write_sensor_data(data, lng, lat, L, stag,
         ykeep = sorted(np.unique(y))[::axthin]
         idx = np.array([xi in xkeep and yi in ykeep for xi, yi in zip(x, y)])
         x, y, v = x[idx], y[idx], v[idx]
+        if zkey: z = z[idx]
 
     # Come up with transformed DataFrames so we can just use to_csv.
     # If we're doing FieldObs sensors those are understood to be at z = 0.
     if zval is None:
         sdata = pd.DataFrame(np.array([x, y])).T
     else:
-        z = np.ones(x.shape) * zval
+	if not zkey:
+		z = np.ones(x.shape) * zval
         sdata = pd.DataFrame(np.array([x, y, z])).T
     rdata = pd.DataFrame(np.array([v])).T
 

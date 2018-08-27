@@ -1,0 +1,5 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=2:mem=16GB,walltime=06:00:00
+module load python/3.5.1
+cd $script_dir
+python parse_error_log.py $data_dir

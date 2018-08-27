@@ -1,0 +1,4 @@
+for dir_num in {01,02,03,04,05,06,07}
+do
+	in="/rds/PRJ-SIH4HPC/obsidian/experiments/06_19_2018/${dir_num}/${dir_num}";out=$dir_num;cp $in/*.pbs $out;cp $in/*.csv $out;cp $in/input.obsidian $out; cp $in/run_experiment.sh $out;cp $in/obsidian_config $out;
+done

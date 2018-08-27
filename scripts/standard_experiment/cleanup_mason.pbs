@@ -1,0 +1,4 @@
+#!/bin/bash
+#voxel_dir=$path_in/voxels
+#mkdir -p $voxel_dir
+mv $path_in $path_out

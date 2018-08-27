@@ -1,0 +1,8 @@
+#!/bin/bash
+#PBS -P RDS-FSC-BGH-RW
+#PBS -l select=1:ncpus=2:mem=16GB
+#PBS -m abe
+#PBS -l walltime=01:00:00
+ulimit -c unlimited
+cd "/project/RDS-FSC-obsidian-RW/obsidian-dk/"
+echo "test"

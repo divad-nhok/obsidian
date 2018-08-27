@@ -1,0 +1,8 @@
+#!/bin/bash
+module load python/3.5.1
+#script_path=/project/RDS-FSC-obsidian-RW/obsidian-dk/scripts/parse_error_log/parse_error_log.py
+dir_project=`pwd`
+fname_obsidian_err=obsidian.pbs.e2399450
+echo $dir_project
+echo $fname_obsidian_err
+python /project/RDS-FSC-obsidian-RW/obsidian-dk/scripts/parse_error_log/parse_error_log.py "$dir_project" "$fname_obsidian_err"

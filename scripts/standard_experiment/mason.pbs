@@ -1,0 +1,10 @@
+#!/bin/bash
+ulimit -c unlimited
+module load gcc/4.9.3
+cd $dir_project
+echo "mason job started at: `date`" >> $log_file
+$dir_build/mason -l-4 -x 32 -y 32 -z 32 -p $pickaxe_file
+echo "mason job ended at: `date`" >> $log_file
+dir_vox_new=$dir_project/voxels
+mkdir -p $dir_vox_new
+mv $dir_project/voxels*.npz $dir_vox_new

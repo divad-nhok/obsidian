@@ -1,0 +1,14 @@
+#!/bin/bash
+#PBS -P RDS-FEI-Bayes_BMC-RW
+#PBS -q dtq
+#PBS -l select=1:ncpus=2:mem=16GB,walltime=24:00:00
+experiment_date="07_18_2018"
+experiment_num="13"
+artemis_experiments_path="/project/RDS-FSC-obsidian-RW/obsidian-dk/experiments"
+in_path="${artemis_experiments_path}/${experiment_date}/${experiment_num}"
+out_path="/rds/PRJ-SIH4HPC/obsidian/experiments/${experiment_date}"
+echo $artemis_experiments_path
+echo $in_path
+echo $out_path
+mkdir -p $out_path
+mv $in_path $out_path

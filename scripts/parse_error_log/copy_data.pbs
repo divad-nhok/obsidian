@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -l select=1:ncpus=2:mem=16GB,walltime=06:00:00
+echo $rds_path
+echo $project_path
+mkdir -p $project_path
+size_rds=`stat --printf="%s" $rds_path/obsidian.pbs.e*`
+if [ ! -f $project_path/obsidian.pbs.e* ]
+then
+	size_project=0
+else
+	size_project=`stat --printf="%s" $project_path/obsidian.pbs.e*`
+fi
+echo $size_project
+echo $size_rds
+if [ "$size_project" -ne "$size_rds" ]
+then
+	echo "Different sizes"
+	cp $rds_path/obsidian.pbs.e* $project_path
+else
+	echo "Same size"
+	exit 0
+fi

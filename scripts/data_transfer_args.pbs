@@ -1,0 +1,3 @@
+#!/bin/bash
+mkdir -p $dir_rds
+mv $dir_project $dir_rds

@@ -1,0 +1,11 @@
+- scripts for running a standard experiment
+- can edit most inputs in run\_experiment.sh
+- run\_experiment.sh will the following:
+	- obsidian + shards
+	- obsidian errror log parser
+	- obsidian error log moved to RDS
+	- pickaxe
+	- mason
+	- mean posterior per layer
+	- move mason output voxels to RDS
+	- move pickaxe output to RDS

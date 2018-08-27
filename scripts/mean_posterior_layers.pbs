@@ -1,0 +1,6 @@
+#!/bin/bash
+ulimit -c unlimited
+module load python/3.6.5
+
+cd $dir_project
+python $python_script_get_mean_posterior $dir_project_vox $dir_project

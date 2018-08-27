@@ -15,6 +15,7 @@
 #include "world/transitions.hpp"
 #include "world/voxelise.hpp"
 #include "io/npy.hpp"
+#include <glog/logging.h>
 
 namespace obsidian
 {
@@ -100,22 +101,28 @@ namespace obsidian
       mtReadings.push_back(stateMt);
       fieldReadings.row(i) = results[i].field.readings;
     }
+    /*
     Eigen::MatrixXcd mtReadingMatrix = Eigen::MatrixXcd::Zero(size, nMt * maxFreqs * 4);
     for (uint i = 0; i < size; i++)
     {
       uint c = 0;
       for (uint f = 0; f < mtReadings[i].size(); f++)
       {
-        // uint s = mtReadings[i][f].size();
-        mtReadingMatrix.block(i, c, 1, maxFreqs) = mtReadings[i][f];
+        uint s = mtReadings[i][f].size();
+	LOG(INFO)<< "mtReadings s: " << s;
+	LOG(INFO)<< "block arg i: " << i;
+	LOG(INFO)<< "block arg c: " << c;
+	LOG(INFO)<< "block arg maxFreqs: " << maxFreqs;
+        mtReadingMatrix.block(i, c, 1, s) = mtReadings[i][f];
         c += maxFreqs;
       }
     }
+    */
     writer.write<double>("gravReadings", gravReadings);
     writer.write<double>("magReadings", magReadings);
     writer.write<double>("thermReadings", thermReadings);
-    writer.write<std::complex<double>>("mtReadings", mtReadingMatrix);
-    writer.write<double>("mtNumFreqs", nFreqs);
+    //writer.write<std::complex<double>>("mtReadings", mtReadingMatrix);
+    //writer.write<double>("mtNumFreqs", nFreqs);
     writer.write<int>("fieldReadings", fieldReadings.cast<int>());
   }
 

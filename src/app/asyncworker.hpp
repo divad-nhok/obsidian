@@ -49,6 +49,10 @@ namespace obsidian
       if (params.returnSensorData)
         result = synthetic;
       result.likelihood = lh::likelihood<f>(synthetic, real, spec);
+      if (std::isnan(result.likelihood))
+      {
+        result.likelihood = -std::numeric_limits<double>::infinity();
+      }
       CHECK(!std::isnan(result.likelihood)) << f << " numerical error";
       // Submit the results
       // Use a uint for the job ID
