@@ -124,9 +124,13 @@ def main_contours(
 
     # Load everything
     magSensors = np.loadtxt(os.path.join(parent_dir, "magSensors.csv"), delimiter=',')
+    print(magSensors.shape)
     magReadings = np.loadtxt(os.path.join(parent_dir, "magReadings.csv"), delimiter=',')
+    print(magReadings.shape)
     gravSensors = np.loadtxt(os.path.join(parent_dir, "gravSensors.csv"), delimiter=',')
+    print(gravSensors.shape)
     gravReadings = np.loadtxt(os.path.join(parent_dir, "gravReadings.csv"), delimiter=',')
+    print(gravReadings.shape)
     samples = np.load(os.path.join(parent_dir, runtag) + ".npz")
 
     # Make a few plots of sensors
@@ -192,6 +196,16 @@ def main_boundarymovie():
         gp_predict(gravSensors, layer_pars, ((0.0, 2e+4), (0.0, 2e+4)))
         plt.savefig('boundary_movie_frame{:04d}.png'.format(i))
         plt.close()
+
+def plot_actual():
+    # Contour map of residuals in f
+    fig = plt.figure(figsize=(10,10))
+    ax = plt.gca()
+    plt.tricontourf(x, y, d, alpha=0.5, label='Data')
+    plt.colorbar()
+    plt.xlabel("Eastings (m)")
+    plt.ylabel("Northings (m)")
+    plt.legend(loc='upper right')
 
 
 if __name__ == "__main__":

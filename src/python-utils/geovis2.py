@@ -156,4 +156,5 @@ if __name__ == "__main__":
         print("Adding samples from", fn)
         view.add_samples(MasonView(fn))
     for i in range(len(view.layers)):
-        view.show_vox(lambda v: MasonView.meanlayer(v, i))
+        #view.show_vox(lambda v: MasonView.meanlayer(v, i))
+        view.show_vox(lambda v: MasonView.meanrockprop(v, i))

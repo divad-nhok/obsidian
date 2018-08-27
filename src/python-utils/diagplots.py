@@ -243,9 +243,12 @@ def parameters_plot(
     fontsize = 20,
     plot_type = 'hist', # 'hist' or 'trace'
     plot_extension = 'png',
-    save_dir = ''
+    save_dir = '',
+    idx_list = None
 ):
     vals = samples[key]
+    if idx_list:
+        vals = vals[:, idx_list]
     #print('vals.shape: {}'.format(vals.shape))
     n = vals.shape[1]
     iterations = range(vals.shape[0])
@@ -253,7 +256,8 @@ def parameters_plot(
 
     fig, axes = plt.subplots(
         rows, cols, 
-        figsize = (fig_width, fig_height)
+        figsize = (fig_width, fig_height),
+        squeeze = False
     )
 
     fig.add_subplot(111, frameon=False)
