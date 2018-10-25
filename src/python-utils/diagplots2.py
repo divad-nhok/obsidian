@@ -157,9 +157,10 @@ def main_fieldobs(
     """
 
     # First show the data we expect
-    fieldSensors = pd.read_csv(os.path.join(parent_dir,'fieldSensors.csv'), names=['x','y'], comment='#')
-    fieldReadings = pd.read_csv(os.path.join(parent_dir,'fieldReadings.csv'), names=['val'], comment='#')
+    fieldSensors = pd.read_csv(os.path.join(parent_dir,'fieldobsSensors.csv'), names=['x','y'], comment='#')
+    fieldReadings = pd.read_csv(os.path.join(parent_dir,'fieldobsReadings.csv'), names=['val'], comment='#')
     fieldLabels = fieldSensors.assign(val=fieldobs_lookup(fieldReadings.val))
+    actual = fieldReadings.val
     fig = plt.figure(figsize=(10,10))
     display_ground_truth(fieldLabels, show=False)
     plt.title('Field Observations'.format(runtag))
@@ -171,10 +172,31 @@ def main_fieldobs(
     i = len(samples['fieldReadings'])
     readings = samples['fieldReadings'][i-1]
     fieldLabels.val = fieldobs_lookup(readings)
+    predicted = readings
     display_ground_truth(fieldLabels, show=False)
     plt.title('Forward-Modeled Field Observations, '
               'Sample {} from MCMC Chain'.format(i))
     plt.savefig(os.path.join(parent_dir,'boundary_fwdmodel_endchain.png'))
+    plt.close()
+
+    # residuals
+    fig = plt.figure(figsize=(10,10))
+    resid = actual - predicted
+    plt.hist(resid)
+    plt.title('field obs residual')
+    plt.savefig(os.path.join(parent_dir,'field-obs-resid.png'))
+    plt.close()
+
+    # residuals debug
+    fig = plt.figure(figsize=(10,10))
+    b0 = predicted == 0
+    b1 = predicted == 1
+    predicted[b0] = 1
+    predicted[b1] = 0
+    resid = actual - predicted
+    plt.hist(resid)
+    plt.title('field obs residual')
+    plt.savefig(os.path.join(parent_dir,'field-obs-resid-v2.png'))
     plt.close()
 
 def main_boundarymovie():

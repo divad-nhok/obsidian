@@ -137,7 +137,6 @@ def plot_sensor_output(
             actual = readings - readings.mean()
             N, N2 = samples[readings_key].shape
             chain = samples[readings_key][N/2:]
-            fwd_model = chain.mean(axis=0) - chain.mean()
             resid = actual - fwd_model
             abs_resid = np.abs(resid)
             # contour map of actual readings
@@ -272,3 +271,4 @@ def plot_layer_posteriors(
         print(fname_save)
         run_geovis_app(layer_voxels, fname_save)
         plt.clf()
+    return(view)
