@@ -1,11 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import os
 from pandas.plotting import autocorrelation_plot
 import re
 import visvis as vv
 
 import geovis_notebook_version
+from diagplots2 import fieldobs_lookup, display_ground_truth
 
 fig_height = 10
 fig_width = 10
@@ -44,14 +46,15 @@ def plot_acf(
     data,
     img_format = 'png',
     fpath_out = None,
-    plot_title = None
+    plot_title = None,
+    thinned_amount = '??'
 ):
     try:
         plt.rc('text', usetex = True)
         plt.rc('font', family = 'serif')
     except:
         pass
-    x_label = 'MCMC iteration (thinned $\\times 100$)'
+    x_label = 'MCMC iteration (thinned $\\times {}$)'.format(thin_amount)
     y_label = 'Autocorrelation'
     f = plt.figure(figsize = (fig_width, fig_height))
     ax = plt.gca()
@@ -103,6 +106,66 @@ def plot_trace(
     plt.savefig(fpath_out)
     plt.clf()
 
+def plot_fieldobs(
+    fpath_samples_list,
+    dir_out_list,
+    fpath_csv_list,
+    data_names_list,
+):
+    sensor_name = 'fieldobs'
+    for fpath_samples, dir_out, fpath_csv_list_i in zip(fpath_samples_list, dir_out_list, fpath_csv_list):
+        if not os.path.isdir(dir_out):
+            os.makedirs(dir_out)
+        if os.path.exists(fpath_samples): 
+            samples = np.load(fpath_samples)
+            print('samples path {} exists'.format(fpath_samples))
+            #print(samples.keys())
+        else: 
+            print('samples path {} does not exist'.format(fpath_samples))
+            continue
+        name_list = [['x', 'y'], ['val']]
+        dict_data = {
+            key: pd.read_csv(path, names=names, comment='#')
+            for key, path, names in 
+            zip(data_names_list, fpath_csv_list_i, name_list)
+            if os.path.exists(path)
+        }
+        sensor_key = '{}Sensors'.format(sensor_name)
+        readings_key = '{}Readings'.format(sensor_name)
+        if 'fieldReadings' not in samples.keys():
+            print('fieldReadings key not in samples.keys()')
+            continue
+        sensors = dict_data[sensor_key]
+        readings = dict_data[readings_key]
+        fieldLabels = sensors.assign(val=fieldobs_lookup(readings.val))
+        actual = readings.val
+        
+        fig = plt.figure(figsize=(10,10))
+        display_ground_truth(fieldLabels, show=False)
+        plt.title('Field Observations')
+        out_path = os.path.join(dir_out, 'boundary_data.png')
+        plt.savefig(out_path)
+
+        # Now show samples
+        fig = plt.figure(figsize=(10,10))
+        i = len(samples['fieldReadings'])
+        readings = samples['fieldReadings'][i-1]
+        fieldLabels.val = fieldobs_lookup(readings)
+        predicted = readings
+        display_ground_truth(fieldLabels, show=False)
+        plt.title('Forward-Modeled Field Observations, '
+                  'Sample {} from MCMC Chain'.format(i))
+        plt.savefig(os.path.join(dir_out,'boundary_fwdmodel_endchain.png'))
+        plt.close()
+
+        # residuals
+        fig = plt.figure(figsize=(10,10))
+        resid = actual - predicted
+        plt.hist(resid)
+        plt.title('field obs residual')
+        plt.savefig(os.path.join(dir_out,'field-obs-resid.png'))
+        plt.close()
+
 def plot_sensor_output(
     fpath_samples_list,
     dir_out_list,
@@ -125,6 +188,7 @@ def plot_sensor_output(
             for key, path in zip(data_names_list, fpath_csv_list_i)
             if os.path.exists(path)
         }
+        print(dict_data.keys())
         for sensor_name in sensor_name_list:
             sensor_key = '{}Sensors'.format(sensor_name)
             readings_key = '{}Readings'.format(sensor_name)
@@ -133,11 +197,17 @@ def plot_sensor_output(
                 continue
             sensors = dict_data[sensor_key]
             readings = dict_data[readings_key]
+            print(sensors.shape)
+            print(readings.shape)
             x, y, z = sensors.T
             actual = readings - readings.mean()
+            print(actual.shape)
             N, N2 = samples[readings_key].shape
+            print(N, N2)
             chain = samples[readings_key][N/2:]
+            print(chain.shape)
             fwd_model = chain.mean(axis=0) - chain.mean()
+            print(fwd_model.shape)
             resid = actual - fwd_model
             abs_resid = np.abs(resid)
             # contour map of actual readings
