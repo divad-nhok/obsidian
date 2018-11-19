@@ -104,7 +104,6 @@ def display_ground_truth(labels, spherical=True, show=True):
         plt.show()
 
 def fieldobs_lookup(readings):
-
     from gascoyne_config import config_layers
     readstr = [ ]
     for i, v in enumerate(readings):
