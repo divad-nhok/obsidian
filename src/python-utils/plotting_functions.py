@@ -446,10 +446,10 @@ def plot_sensor_output(
                 width = 0.5
                 hist_xlab = 'Data - Model (mgal)'
             plot_data_list = [
-                #(plot_contour, (x, y, actual), 'posterior', dict(data2 = fwd_model, cmap = 'viridis')),
-                #(plot_contour, (x, y, actual), 'resid', dict(data2 = resid, cmap = 'magma')),
-                #(plot_hist, fwd_model, 'posterior', dict(width = width, xlab = hist_xlab)),
-                #(plot_hist, resid, 'resid', dict(width = width, xlab = hist_xlab)),
+                (plot_contour, (x, y, actual), 'posterior', dict(data2 = fwd_model, cmap = 'viridis')),
+                (plot_contour, (x, y, actual), 'resid', dict(data2 = resid, cmap = 'magma')),
+                (plot_hist, fwd_model, 'posterior', dict(width = width, xlab = hist_xlab)),
+                (plot_hist, resid, 'resid', dict(width = width, xlab = hist_xlab)),
             ]
             for plot_func, plot_data, plot_key, plot_args in plot_data_list:
                 if type(plot_data) is tuple:
@@ -483,7 +483,7 @@ def make_resid_table(resid_list, dir_out):
     fname = 'resid-table.csv'
     fout = os.path.join(dir_out, fname)
     table.to_csv(fout)
-    print(table)
+    #print(table)
 
 def plot_contour(
     x, y, data,
