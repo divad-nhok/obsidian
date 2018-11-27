@@ -123,11 +123,26 @@ def run_diagnostic_plots(
                         #print('param.shape: {}'.format(param.shape))
                         data = param[n_burn:]
                         #print('data.shape: {}'.format(data.shape))
-                        plot_func(
-                            param[n_burn:], 
-                            fpath_out = fpath_out, 
-                            plot_title = plot_title
-                        )
+                        if plot_func_name == 'trace':
+                            print(param_title)
+                            if param_title == 'rock density':
+                                print('test')
+                                ylabel = 'Density ($g$ cm$^{-3}$)'
+                            elif param_title == 'magnetic susceptibility':
+                                ylabel = 'Parameter Value'
+                            plot_func(
+                                param[n_burn:], 
+                                fpath_out = fpath_out, 
+                                plot_title = plot_title,
+                                y_label = ylabel,
+                                lw = 0.5
+                            )
+                        else:
+                            plot_func(
+                                param[n_burn:], 
+                                fpath_out = fpath_out, 
+                                plot_title = plot_title
+                            )
 
 def plot_acf(
     data,
@@ -191,17 +206,17 @@ def plot_trace(
     fpath_out = None,
     plot_title = None,
     thin_amount = None,
-    lw = 0.5
+    lw = 0.5,
+    y_label = 'Parameter Value'
 ):
     try:
         plt.rc('text', usetex = True)
         plt.rc('font', family = 'serif')
     except:
         pass
-    x_label = 'MCMC iteration'
+    x_label = 'Sample Number (thinned $\\times 1000$)'
     if thin_amount:
         x_label = 'MCMC iteration (thinned $\\times {}$)'.format(thin_amount)
-    y_label = 'Parameter value'
     f = plt.figure(figsize = (fig_width, fig_height))
     ax = plt.gca()
     data = [reject_outliers(data_i) for data_i in data]
