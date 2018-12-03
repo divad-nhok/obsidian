@@ -46,10 +46,10 @@ H_IGRF = np.array([1.419e+2, 2.8739e+4, -4.62667e+4])
 
 config_layers = pd.DataFrame(
         # layer name, layer type, (min, max) depth in m, (nx, ny) control pts
-        [('Durlacher Supersuite', 'normal', 0.0, 1.0e+4, 5, 5),
-         ('Moorarie Supersuite',  'normal', 0.0, 1.5e+4, 5, 5),
-         ('Moogie Metamorphics',  'normal', 0.0, 2.5e+4, 5, 5),
-         ('Halfway Gneiss',       'normal', 0.0, 2.5e+4, 5, 5),],
+        [('Halfway Gneiss', 'normal', 0.0, 1.0e+4, 5, 5),
+         ('Durlacher Supersuite',  'normal', 0.0, 1.5e+4, 5, 5),
+         ('XXX',  'normal', 0.0, 2.5e+4, 5, 5),
+         ('YYY',       'normal', 0.0, 2.5e+4, 5, 5),],
         columns=['name','type','zmin','zmax','nx','ny'])
 
 config_params = { 'lng': 116.10, 'lat': -24.85, 'L': 2.0e+4,

@@ -380,7 +380,7 @@ def plot_fieldobs(
             dir_out,
         )
 
-        # Now show samples
+        # scatter of predicted
         i = len(samples['fieldReadings'])
         readings = samples['fieldReadings'][i-1]
         fieldLabels.val = fieldobs_lookup(readings)
@@ -767,7 +767,7 @@ def autocorrelation_plot(series, ax=None, extra_lines=False, **kwds):
         ax.axhline(y=-z99 / np.sqrt(n), linestyle='--', color='grey')
         ax.set_xlabel("Lag")
         ax.set_ylabel("Autocorrelation")
-    ax.plot(x, y, **kwds)
+    ax.plot(x, y, c='k')
     if 'label' in kwds:
         ax.legend()
     return ax
